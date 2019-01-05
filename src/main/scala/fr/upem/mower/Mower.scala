@@ -16,10 +16,18 @@ final case class Mower(coordinate: Coordinate, orientation: Orientation) {}
 object Mower {
   def move(mow: Mower, board: Board): Mower = {
     mow.orientation match {
-      case N if mow.coordinate.posY + 1 <= board.coordinate.posY => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY + 1), mow.orientation)
-      case E if mow.coordinate.posX + 1 <= board.coordinate.posY => Mower(Coordinate(mow.coordinate.posX + 1, mow.coordinate.posY), mow.orientation)
-      case W if mow.coordinate.posX - 1 >= 0 => Mower(Coordinate(mow.coordinate.posX - 1, mow.coordinate.posY), mow.orientation)
-      case S if mow.coordinate.posY - 1 >= 0 => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY - 1), mow.orientation)
+      case N if mow.coordinate.posY + 1 <= board.coordinate.posY && Board.validCoordinate(Coordinate(mow.coordinate.posX, mow.coordinate.posY + 1), board.mowers)
+      => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY + 1), mow.orientation)
+
+      case E if mow.coordinate.posX + 1 <= board.coordinate.posY && Board.validCoordinate(Coordinate(mow.coordinate.posX + 1, mow.coordinate.posY), board.mowers)
+      => Mower(Coordinate(mow.coordinate.posX + 1, mow.coordinate.posY), mow.orientation)
+
+      case W if mow.coordinate.posX - 1 >= 0 && Board.validCoordinate(Coordinate(mow.coordinate.posX - 1, mow.coordinate.posY), board.mowers)
+      => Mower(Coordinate(mow.coordinate.posX - 1, mow.coordinate.posY), mow.orientation)
+
+      case S if mow.coordinate.posY - 1 >= 0 && Board.validCoordinate(Coordinate(mow.coordinate.posX, mow.coordinate.posY - 1), board.mowers)
+      => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY - 1), mow.orientation)
+
       case _ => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY), mow.orientation)
     }
   }
