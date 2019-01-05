@@ -34,7 +34,6 @@ object Mower {
 
   def newOrientation(mow: Mower, direction: Direction): Mower = {
     direction match {
-
       case G =>
         mow.orientation match {
           case N => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY), W)
@@ -50,6 +49,8 @@ object Mower {
           case W => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY), N)
           case S => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY), W)
         }
+
+      case _ => Mower(Coordinate(mow.coordinate.posX, mow.coordinate.posY), mow.orientation)
 
     }
   }
