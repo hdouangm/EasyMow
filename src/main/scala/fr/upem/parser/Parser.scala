@@ -14,12 +14,12 @@ import fr.upem.mobility.Directions
   */
 object Parser extends App {
   def readFile(fileName: String): List[String] = {
-    return Source.fromFile(fileName).getLines().toList
+    Source.fromFile(fileName).getLines().toList
   }
 
   def readBoardSize(lines: List[String]): Coordinate = {
     val intRegex = "^(\\d+) (\\d+)$".r()
-    lines(0) match {
+    lines.head match {
       case intRegex(x, y) => Coordinate(x.toInt, y.toInt)
       case _ => Coordinate(0,0)
     }
@@ -28,8 +28,9 @@ object Parser extends App {
   def readMower(line: String, board: Board): Option[Mower] ={
     val newMowerRegex = "^(\\d+) (\\d+) (N|S|E|W)$".r()
     line match {
-      case newMowerRegex(x, y, dir) => return Option(Mower(Coordinate(x.toInt,y.toInt), Orientations.toOrientation(dir).get));
-      case _ => return Option.empty
+      case newMowerRegex(x, y, dir) if Board.validCoordinate(Coordinate(x.toInt, y.toInt), board.mowers)
+      => Option(Mower(Coordinate(x.toInt,y.toInt), Orientations.toOrientation(dir).get))
+      case _ => Option.empty
     }
   }
 
@@ -37,52 +38,59 @@ object Parser extends App {
 
   def moveMower(mower: Mower, line: String, board: Board): Mower ={
     if (line.length == 0){
-      return mower;
+      println(mower.coordinate.posX + " " + mower.coordinate.posY + " " + mower.orientation)
+      return mower
     }
-    val char = line(0);
+    val char = line(0)
     if (char == 'D' || char == 'G'){
-      val command = Directions.toDirection(char.toString).get;
-      return moveMower(Mower.newOrientation(mower, command), line.drop(1), board);
+      val command = Directions.toDirection(char.toString).get
+      return moveMower(Mower.newOrientation(mower, command), line.drop(1), board)
     }
     if (char == 'A'){
-      return moveMower(Mower.move(mower, board), line.drop(1), board);
+      return moveMower(Mower.move(mower, board), line.drop(1), board)
     }
-    return moveMower(mower, line.drop(1), board);
+    moveMower(mower, line.drop(1), board)
   }
 
   def moveMowers(board: Board, commands: List[String]): Board ={
-    if (commands.length == 0){
+    if (commands.length == 1){
+      println("error : The file is incomplete !")
       return board
     }
-    val mower = readMower(commands(0), board);
-    val mowerFinal = moveMower(mower.get, commands(1), board);
-    return moveMowers(Board(board.coordinate, board.mowers :+ mowerFinal), commands.drop(2));
+    if (commands.isEmpty){
+      return board
+    }
+    val mower = readMower(commands.head, board)
+    if (mower.isEmpty){
+      println("error : wrong mower, skipping the mower and the next instruction !")
+      return moveMowers(board, commands.drop(2))
+    }
+    val mowerFinal = moveMower(mower.get, commands(1), board)
+    moveMowers(Board(board.coordinate, board.mowers :+ mowerFinal), commands.drop(2))
   }
 
 
 
   override def main(args: Array[String]): Unit = {
     if (args.length < 1){
-      println("Please, specify the file's name you want to use !");
+      println("error : Please, specify the file's name you want to use !")
     }
     else {
-      val path = "Files/" + args(0);
+      val path = "Files/" + args(0)
       if (!Files.exists(Paths.get(path))){
-        println("The file you specified does not exist");
+        println("error : The file you specified does not exist")
       }
       else {
-        val lines = readFile(path);
-        val boardCoordinate = readBoardSize(lines);
+        val lines = readFile(path)
+        val boardCoordinate = readBoardSize(lines)
         if (boardCoordinate.posX == 0 && boardCoordinate.posY == 0){
-          println("The board's coordinates are wrong !")
+          println("error : The board's coordinates are wrong !")
         }
         else {
-          val board = Board(boardCoordinate, List.empty[Mower]);
-          val commands = lines.drop(1);
-          val boardFinal = moveMowers(board, commands);
-          for (mow <- boardFinal.mowers){
-            println(mow.coordinate.posX + " " + mow.coordinate.posY);
-          }
+          val board = Board(boardCoordinate, List.empty[Mower])
+          val commands = lines.drop(1)
+          moveMowers(board, commands)
+          println("success : terminated")
         }
       }
     }

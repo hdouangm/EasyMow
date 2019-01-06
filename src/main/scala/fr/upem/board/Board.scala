@@ -12,7 +12,7 @@ final case class Board(coordinate: Coordinate, mowers: List[Mower]) {}
 object Board {
   def validCoordinate(coordinate: Coordinate, mowers: List[Mower]): Boolean = {
     for (elem <- mowers){
-      if (coordinate.posX < elem.coordinate.posX && coordinate.posY == elem.coordinate.posY){
+      if (coordinate.posX == elem.coordinate.posX && coordinate.posY == elem.coordinate.posY){
         return false
       }
 
