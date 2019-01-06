@@ -2,7 +2,6 @@ package fr.upem.parser
 
 import scala.io.Source
 import java.nio.file.{Files, Paths}
-
 import fr.upem.board.Board
 import fr.upem.coordinate.Coordinate
 import fr.upem.mower.Mower
