@@ -13,11 +13,12 @@ object Board {
   def validCoordinate(coordinate: Coordinate, mowers: List[Mower]): Boolean = {
     for (elem <- mowers){
       if (coordinate.posX == elem.coordinate.posX && coordinate.posY == elem.coordinate.posY){
+        println("error : mowers can't be at the same place ! Skipping to next instruction if possible !")
         return false
       }
 
     }
-    return true
+    true
   }
 }
 

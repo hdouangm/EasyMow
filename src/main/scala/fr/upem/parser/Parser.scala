@@ -62,7 +62,6 @@ object Parser extends App {
     }
     val mower = readMower(commands.head, board)
     if (mower.isEmpty){
-      println("error : wrong mower, skipping the mower and the next instruction !")
       return moveMowers(board, commands.drop(2))
     }
     val mowerFinal = moveMower(mower.get, commands(1), board)
